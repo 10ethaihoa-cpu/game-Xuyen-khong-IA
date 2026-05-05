@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cuộc Đua Xuyên Không - Nhóm IA</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; margin: 0; padding: 0; background: #2D0A16; overflow: hidden; }
+    .custom-scrollbar::-webkit-scrollbar { width: 8px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #fbcfe8; border-radius: 8px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #f472b6; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <!-- Cấu hình CDN cho React, Babel và Framer Motion -->
+  <script type="importmap">
+  {
+    "imports": {
+      "react": "https://esm.sh/react@18.2.0",
+      "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
+      "framer-motion": "https://esm.sh/framer-motion@10.16.4",
+      "lucide-react": "https://esm.sh/lucide-react@0.292.0"
+    }
+  }
+  </script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <script type="text/babel" data-type="module">
+    import React, { useState, useEffect } from 'react';
+    import { createRoot } from 'react-dom/client';
+    import { motion, AnimatePresence } from 'framer-motion';
+    import { Rocket, Atom, Zap, Globe, Lock, Unlock, Clock, Trophy, Users, BarChart2, ChevronRight, RotateCcw, Star, Minimize, Maximize, PlayCircle, Shield, AlertTriangle, Flame, CloudLightning, CheckSquare, ListChecks } from 'lucide-react';
+
+    const TEAM_DATA = {
+      "PHƯỢNG HOÀNG LỬA": [
+        {
+          id: "t1_s1", title: "TRẠM 1: KHỞI NGUỒN", type: "Trắc nghiệm",
+          story: "Phượng Hoàng sải cánh về thời điểm sơ khai. Hãy xác định tọa độ của nguyên tố.",
+          question: "Nguyên tố sodium (Na) thuộc chu kì mấy và nhóm nào trong bảng tuần hoàn?",
+          options: ["A. Chu kì 2, nhóm IA", "B. Chu kì 3, nhóm IA", "C. Chu kì 3, nhóm IIA", "D. Chu kì 4, nhóm IA"],
+          correct: 1
+        },
+        {
+          id: "t1_s2", title: "TRẠM 2: BẢN CHẤT", type: "Trắc nghiệm",
+          story: "Phân tích hiện tượng tiếp xúc môi trường. Cần bảo vệ năng lượng lõi.",
+          question: "Khi cắt kim loại sodium (Na), bề mặt vừa cắt lấp lánh nhưng sẽ nhanh chóng xỉn đi. Nguyên nhân là do Na phản ứng chủ yếu với chất nào trong không khí ở nhiệt độ thường?",
+          options: ["A. Khí nitrogen (N₂)", "B. Khí oxygen (O₂) và hơi nước", "C. Khí carbon dioxide (CO₂)", "D. Khí hiếm argon (Ar)"],
+          correct: 1
+        },
+        {
+          id: "t1_s3", title: "TRẠM 3: BÙNG NỔ", type: "Trắc nghiệm",
+          story: "Nhiệt lượng tỏa ra dữ dội khi va chạm với nước. Dấu hiệu nhận biết là gì?",
+          question: "Nhỏ vài giọt dung dịch phenolphtalein vào cốc nước, sau đó thả một mẩu kim loại potassium (K) vào. Hiện tượng quan sát được là:",
+          options: ["A. K chìm xuống, dung dịch không đổi màu", "B. K chạy trên mặt nước, bốc cháy, dung dịch hóa hồng", "C. Dung dịch sủi bọt khí và hóa xanh lam", "D. Không có hiện tượng sủi bọt khí"],
+          correct: 1
+        },
+        {
+          id: "t1_s4", title: "TRẠM 4: ĐỜI SỐNG", type: "Đếm mệnh đề",
+          story: "Trạm cuối cùng! Tổng hợp dữ liệu để mở khóa không gian.",
+          question: "Cho các phát biểu sau về kim loại kiềm:",
+          statements: [
+            "(a) Để bảo quản kim loại kiềm, người ta thường ngâm chìm chúng trong dầu hỏa.",
+            "(b) Hợp kim lithium - aluminum siêu nhẹ được dùng trong kĩ thuật hàng không.",
+            "(c) Kim loại kiềm có thể được điều chế bằng phương pháp nhiệt luyện.",
+            "(d) Sodium hydrogencarbonate (NaHCO₃) được dùng làm thuốc giảm đau dạ dày."
+          ],
+          ask: "Số phát biểu ĐÚNG là:",
+          options: ["A. 1", "B. 2", "C. 3", "D. 4"],
+          correct: 2
+        }
+      ],
+      "BẠCH LONG VƯƠNG": [
+        {
+          id: "t2_s1", title: "TRẠM 1: KHỞI NGUỒN", type: "Trắc nghiệm",
+          story: "Rồng Trắng bay lượn phân tích đặc điểm cấu hình electron.",
+          question: "Cấu hình electron lớp ngoài cùng chung của các nguyên tử kim loại kiềm là:",
+          options: ["A. ns²", "B. ns²np¹", "C. ns¹", "D. ns²np⁵"],
+          correct: 2
+        },
+        {
+          id: "t2_s2", title: "TRẠM 2: BẢN CHẤT", type: "Trắc nghiệm",
+          story: "Biến thiên tuần hoàn diễn ra như thế nào qua các thời đại?",
+          question: "Theo chiều tăng dần của điện tích hạt nhân (từ Li đến Cs), nhiệt độ nóng chảy của các kim loại kiềm biến đổi như thế nào?",
+          options: ["A. Tăng dần", "B. Giảm dần", "C. Không đổi", "D. Tăng rồi giảm"],
+          correct: 1
+        },
+        {
+          id: "t2_s3", title: "TRẠM 3: BÙNG NỔ", type: "Đếm mệnh đề",
+          story: "Đánh giá mức độ phản ứng với các hợp chất.",
+          question: "Cho các phát biểu sau về tính chất hóa học:",
+          statements: [
+            "(a) Trong các phản ứng hóa học, kim loại kiềm đóng vai trò là chất khử rất mạnh.",
+            "(b) Khí sinh ra khi kim loại kiềm tác dụng với nước là khí oxygen.",
+            "(c) Tính khử của các kim loại kiềm tăng dần từ lithium đến caesium.",
+            "(d) Hợp chất của sodium (Na) khi đốt cháy cho ngọn lửa màu vàng rực rỡ."
+          ],
+          ask: "Số phát biểu ĐÚNG là:",
+          options: ["A. 1", "B. 2", "C. 3", "D. 4"],
+          correct: 2
+        },
+        {
+          id: "t2_s4", title: "TRẠM 4: ĐỜI SỐNG", type: "Trắc nghiệm",
+          story: "Xây dựng nhà máy sản xuất kim loại. Phương pháp nào là tối ưu?",
+          question: "Trong công nghiệp, người điều chế kim loại sodium (Na) bằng phương pháp nào sau đây?",
+          options: ["A. Điện phân dung dịch NaCl", "B. Nhiệt luyện dùng khí CO", "C. Thủy luyện", "D. Điện phân nóng chảy muối NaCl"],
+          correct: 3
+        }
+      ],
+      "KỲ LÂN SẤM SÉT": [
+        {
+          id: "t3_s1", title: "TRẠM 1: KHỞI NGUỒN", type: "Trắc nghiệm",
+          story: "Sức mạnh sấm sét. Đo lường trọng lượng của các nguyên tố.",
+          question: "Trong các kim loại sau đây, kim loại nào nhẹ nhất (có khối lượng riêng nhỏ nhất)?",
+          options: ["A. Sodium (Na)", "B. Potassium (K)", "C. Lithium (Li)", "D. Rubidium (Rb)"],
+          correct: 2
+        },
+        {
+          id: "t3_s2", title: "TRẠM 2: BẢN CHẤT", type: "Đếm mệnh đề",
+          story: "Kỳ Lân soi rọi cấu trúc bên trong. Dữ liệu nào khớp với kim loại kiềm?",
+          question: "Cho các phát biểu sau về tính chất vật lý:",
+          statements: [
+            "(a) Các kim loại kiềm đều có nhiệt độ nóng chảy và nhiệt độ sôi thấp.",
+            "(b) Kim loại kiềm có kiểu mạng tinh thể lập phương tâm diện.",
+            "(c) Kim loại sodium (Na) mềm đến mức có thể cắt dễ dàng bằng dao.",
+            "(d) Bán kính nguyên tử của kim loại kiềm lớn nhất so với các nguyên tố cùng chu kì."
+          ],
+          ask: "Số phát biểu ĐÚNG là:",
+          options: ["A. 1", "B. 2", "C. 3", "D. 4"],
+          correct: 2
+        },
+        {
+          id: "t3_s3", title: "TRẠM 3: BÙNG NỔ", type: "Trắc nghiệm",
+          story: "Nhận biết nguyên tố qua phổ ngọn lửa.",
+          question: "Sự tạo thành ngọn lửa có màu đặc trưng là cách nhận biết. Hợp chất của potassium (K) khi đốt cho ngọn lửa màu gì?",
+          options: ["A. Vàng rực rỡ", "B. Đỏ tía", "C. Tím", "D. Xanh lục"],
+          correct: 2
+        },
+        {
+          id: "t3_s4", title: "TRẠM 4: ĐỜI SỐNG", type: "Trắc nghiệm",
+          story: "Từ hóa chất đến y tế. Hợp chất nào giúp xoa dịu cơn đau?",
+          question: "Hợp chất nào của kim loại sodium được sử dụng phổ biến làm bột nở và làm thuốc giảm đau dạ dày?",
+          options: ["A. Sodium carbonate (Na₂CO₃)", "B. Sodium hydroxide (NaOH)", "C. Sodium chloride (NaCl)", "D. Sodium hydrogencarbonate (NaHCO₃)"],
+          correct: 3
+        }
+      ],
+      "HẮC BÁO CHIẾN BINH": [
+        {
+          id: "t4_s1", title: "TRẠM 1: KHỞI NGUỒN", type: "Đếm mệnh đề",
+          story: "Chiến binh bóng đêm phân tích cấu trúc hạt nhân và electron.",
+          question: "Cho các phát biểu sau về cấu tạo nguyên tử kim loại kiềm:",
+          statements: [
+            "(a) Các nguyên tử kim loại kiềm đều có 1 electron ở lớp ngoài cùng.",
+            "(b) Trong các hợp chất, số oxi hóa đặc trưng của kim loại kiềm là +1.",
+            "(c) Năng lượng ion hóa thứ nhất của kim loại kiềm lớn nhất so với các nguyên tố cùng chu kì.",
+            "(d) Lớp electron ngoài cùng của nguyên tử kim loại kiềm rất dễ bị tách ra."
+          ],
+          ask: "Số phát biểu ĐÚNG là:",
+          options: ["A. 1", "B. 2", "C. 3", "D. 4"],
+          correct: 2
+        },
+        {
+          id: "t4_s2", title: "TRẠM 2: BẢN CHẤT", type: "Trắc nghiệm",
+          story: "Phân tích long mạch hạt nhân. Nguyên nhân chính tạo nên sức mạnh?",
+          question: "Nguyên nhân chủ yếu làm cho các kim loại kiềm có tính khử rất mạnh là do:",
+          options: ["A. Năng lượng ion hóa thứ nhất rất lớn", "B. Năng lượng ion hóa thứ nhất nhỏ, electron dễ bị mất", "C. Cấu trúc mạng tinh thể rất bền vững", "D. Khối lượng riêng của nguyên tử nhỏ"],
+          correct: 1
+        },
+        {
+          id: "t4_s3", title: "TRẠM 3: BÙNG NỔ", type: "Trắc nghiệm",
+          story: "Cảnh báo phản ứng mãnh liệt. Sản phẩm tạo thành là gì?",
+          question: "Sản phẩm chính của phản ứng giữa kim loại sodium (Na) và nước (H₂O) ở nhiệt độ thường là:",
+          options: ["A. Na₂O và H₂", "B. NaOH và O₂", "C. NaOH và H₂", "D. NaH và O₂"],
+          correct: 2
+        },
+        {
+          id: "t4_s4", title: "TRẠM 4: ĐỜI SỐNG", type: "Trắc nghiệm",
+          story: "Sử dụng vật chất để xây dựng tương lai. Ứng dụng phổ biến?",
+          question: "Nước Javel (chất tẩy rửa, sát trùng phổ biến) là dung dịch hỗn hợp của hai hợp chất nào sau đây?",
+          options: ["A. NaCl và NaClO₃", "B. NaCl và NaClO", "C. KCl và KClO", "D. Na₂CO₃ và NaCl"],
+          correct: 1
+        }
+      ]
+    };
+
+    const playSound = (type) => {
+      try {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContext) return;
+        const ctx = new AudioContext();
+        const osc = ctx.createOscillator();
+        const gainNode = ctx.createGain();
+        
+        osc.connect(gainNode);
+        gainNode.connect(ctx.destination);
+        const now = ctx.currentTime;
+
+        if (type === 'correct') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(440, now);
+          osc.frequency.exponentialRampToValueAtTime(880, now + 0.1);
+          osc.frequency.exponentialRampToValueAtTime(1760, now + 0.3);
+          gainNode.gain.setValueAtTime(0.1, now);
+          gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+          osc.start(); osc.stop(now + 0.5);
+        } else if (type === 'wrong') {
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(100, now);
+          osc.frequency.linearRampToValueAtTime(50, now + 0.3);
+          gainNode.gain.setValueAtTime(0.2, now);
+          gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+          osc.start(); osc.stop(now + 0.4);
+        } else if (type === 'warp') {
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(100, now);
+          osc.frequency.exponentialRampToValueAtTime(2000, now + 0.5);
+          gainNode.gain.setValueAtTime(0.05, now);
+          gainNode.gain.linearRampToValueAtTime(0, now + 0.5);
+          osc.start(); osc.stop(now + 0.5);
+        } else if (type === 'click') {
+          osc.type = 'square';
+          osc.frequency.setValueAtTime(800, now);
+          gainNode.gain.setValueAtTime(0.05, now);
+          gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+          osc.start(); osc.stop(now + 0.05);
+        }
+      } catch (e) {
+        console.error("Audio error", e);
+      }
+    };
+
+    const StarField = () => (
+      <div className="fixed inset-0 overflow-hidden pointer-events-none z-0 bg-[#2D0A16]">
+        {[...Array(60)].map((_, i) => (
+          <div key={i} className="absolute rounded-full opacity-60 animate-pulse"
+            style={{
+              backgroundColor: i % 3 === 0 ? '#fbcfe8' : i % 3 === 1 ? '#f472b6' : '#fda4af',
+              boxShadow: '0 0 10px rgba(244,114,182,0.8)',
+              width: Math.random() * 3 + 2 + 'px',
+              height: Math.random() * 3 + 2 + 'px',
+              top: Math.random() * 100 + 'vh',
+              left: Math.random() * 100 + 'vw',
+              animationDuration: Math.random() * 3 + 2 + 's'
+            }}
+          />
+        ))}
+        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-rose-600/30 blur-[150px] rounded-full"></div>
+        <div className="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] bg-fuchsia-600/20 blur-[150px] rounded-full"></div>
+        <div className="absolute top-[40%] left-[20%] w-[40%] h-[40%] bg-pink-500/15 blur-[120px] rounded-full"></div>
+      </div>
+    );
+
+    const VictoryConfetti = () => (
+      <div className="fixed inset-0 pointer-events-none z-[1] overflow-hidden">
+        {[...Array(120)].map((_, i) => (
+          <motion.div key={i}
+            initial={{ opacity: 1, y: -20, x: Math.random() * window.innerWidth, rotate: 0 }}
+            animate={{ opacity: 0, y: window.innerHeight + 20, rotate: 360, x: Math.random() * window.innerWidth }}
+            transition={{ duration: Math.random() * 3 + 2, ease: "linear", repeat: Infinity, repeatDelay: Math.random() }}
+            className="absolute w-3 h-3 md:w-4 md:h-4 shadow-sm"
+            style={{
+              backgroundColor: ['#FFD700', '#FF4500', '#f472b6', '#00BFFF', '#FF1493'][Math.floor(Math.random() * 5)],
+              borderRadius: Math.random() > 0.5 ? '50%' : '2px',
+            }}
+          />
+        ))}
+      </div>
+    );
+
+    function TimeTravelQuiz() {
+      const [role, setRole] = useState(null); 
+      const [team, setTeam] = useState(null); 
+
+      if (!role) return <RoleSelection onSelectRole={setRole} />;
+      if (role === 'teacher') return <TeacherDashboard onBack={() => setRole(null)} />;
+      if (role === 'student') {
+        if (!team) return <TeamSelection onSelectTeam={setTeam} onBack={() => setRole(null)} />;
+        return <GameInterface team={team} onBack={() => { setTeam(null); }} />;
+      }
+      return null;
+    }
+
+    const RoleSelection = ({ onSelectRole }) => (
+      <div className="h-[100dvh] flex items-center justify-center p-4 relative overflow-hidden bg-[#2D0A16]">
+        <StarField />
+        <div className="relative z-10 w-full max-w-4xl flex flex-col items-center">
+          <div className="relative mb-12 text-center select-none">
+             <h1 className="text-6xl md:text-8xl lg:text-9xl font-black tracking-tighter leading-none mb-1">
+               <span className="block text-transparent bg-clip-text bg-gradient-to-b from-[#f9a8d4] via-[#f43f5e] to-[#be123c]" 
+                     style={{ WebkitTextStroke: '2px #881337', filter: 'drop-shadow(0 4px 0 #881337)' }}>CUỘC ĐUA</span>
+             </h1>
+             <h1 className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-none relative z-10">
+                <span className="block text-transparent bg-clip-text bg-gradient-to-b from-[#fef08a] via-[#eab308] to-[#ca8a04]" 
+                      style={{ WebkitTextStroke: '1.5px #a16207', filter: 'drop-shadow(0 4px 0 #854d0e) drop-shadow(0 0 30px rgba(250,204,21,0.4))' }}>XUYÊN KHÔNG</span>
+             </h1>
+          </div>
+          <div className="bg-[#4c0519]/80 backdrop-blur-md p-8 md:p-12 rounded-3xl border border-rose-800 w-full max-w-3xl text-center shadow-[0_0_50px_rgba(225,29,72,0.2)]">
+            <div className="flex items-center justify-center gap-4 mb-10">
+                <div className="h-[1px] bg-rose-800 flex-1"></div>
+                <h2 className="text-pink-300 text-sm md:text-lg font-bold tracking-[0.2em] uppercase whitespace-nowrap">Chủ đề: Nguyên Tố Nhóm IA</h2>
+                <div className="h-[1px] bg-rose-800 flex-1"></div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 px-2 md:px-8">
+              <button onClick={() => { playSound('click'); onSelectRole('student'); }} className="group h-32 md:h-40 rounded-2xl transition-all hover:scale-105 active:scale-95 bg-gradient-to-br from-pink-400 to-rose-600 p-[2px] shadow-[0_10px_30px_rgba(225,29,72,0.4)]">
+                <div className="w-full h-full bg-gradient-to-b from-[#881337] to-[#4c0519] rounded-2xl flex flex-col items-center justify-center relative overflow-hidden">
+                    <Users size={36} className="mb-2 text-pink-300 opacity-90" />
+                    <div className="text-xl md:text-2xl font-black text-white uppercase tracking-wider drop-shadow-sm">Phi Hành Đoàn</div>
+                    <div className="text-pink-200 font-medium text-xs md:text-sm mt-1 bg-rose-900/50 px-3 py-1 rounded-full">Vào Nhiệm Vụ</div>
+                </div>
+              </button>
+              <button onClick={() => { playSound('click'); onSelectRole('teacher'); }} className="group h-32 md:h-40 rounded-2xl transition-all hover:scale-105 active:scale-95 bg-gradient-to-br from-[#d946ef] to-[#9333ea] p-[2px] shadow-[0_10px_30px_rgba(147,51,234,0.4)]">
+                <div className="w-full h-full bg-gradient-to-b from-[#701a75] to-[#4a044e] rounded-2xl flex flex-col items-center justify-center relative overflow-hidden">
+                    <BarChart2 size={36} className="mb-2 text-fuchsia-300 opacity-90" />
+                    <div className="text-xl md:text-2xl font-black text-white uppercase tracking-wider drop-shadow-sm">Trung Tâm</div>
+                    <div className="text-fuchsia-200 font-medium text-xs md:text-sm mt-1 bg-fuchsia-900/50 px-3 py-1 rounded-full">Chỉ Huy & Theo Dõi</div>
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+
+    const TeamSelection = ({ onSelectTeam, onBack }) => (
+      <div className="h-[100dvh] flex items-center justify-center p-4 relative bg-[#2D0A16]">
+        <StarField />
+        <div className="relative z-10 w-full max-w-5xl">
+          <h2 className="text-4xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-b from-[#fca5a5] to-[#ef4444] text-center mb-12 uppercase tracking-widest drop-shadow-[0_0_20px_rgba(239,68,68,0.4)]" style={{ WebkitTextStroke: '1px #991b1b' }}>CHỌN BIỆT ĐỘI</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+            {[
+                { name: "PHƯỢNG HOÀNG LỬA", tag: "TỔ 1", border: "border-red-500", glow: "shadow-[0_0_20px_rgba(239,68,68,0.4)]", iconBg: "bg-gradient-to-br from-red-400 to-red-600", icon: <Flame size={28} className="text-white"/> },
+                { name: "BẠCH LONG VƯƠNG", tag: "TỔ 2", border: "border-[#0ea5e9]", glow: "shadow-[0_0_20px_rgba(14,165,233,0.4)]", iconBg: "bg-gradient-to-br from-[#38bdf8] to-[#0284c7]", icon: <CloudLightning size={28} className="text-white"/> },
+                { name: "KỲ LÂN SẤM SÉT", tag: "TỔ 3", border: "border-yellow-400", glow: "shadow-[0_0_20px_rgba(250,204,21,0.4)]", iconBg: "bg-gradient-to-br from-yellow-300 to-yellow-500", icon: <Zap size={28} className="text-white"/> },
+                { name: "HẮC BÁO CHIẾN BINH", tag: "TỔ 4", border: "border-[#d946ef]", glow: "shadow-[0_0_20px_rgba(217,70,239,0.4)]", iconBg: "bg-gradient-to-br from-[#e879f9] to-[#c026d3]", icon: <Shield size={28} className="text-white"/> }
+            ].map((t) => (
+              <button key={t.name} onClick={() => { playSound('click'); onSelectTeam(t.name); }} 
+                className={`group relative flex flex-col items-center justify-center p-6 md:p-8 rounded-[2rem] transition-all hover:scale-[1.02] active:scale-95 bg-[#4c0519]/80 backdrop-blur-sm border-4 ${t.border} ${t.glow} hover:shadow-[0_0_40px_currentColor]`}>
+                <div className={`w-20 h-20 rounded-full flex items-center justify-center mb-4 ${t.iconBg} shadow-lg`}>{t.icon}</div>
+                <h3 className="text-2xl md:text-3xl lg:text-4xl font-black text-white uppercase tracking-wider mb-2">{t.name}</h3>
+                <div className={`text-sm md:text-base font-bold text-black px-6 py-1.5 rounded-full uppercase ${t.iconBg}`}>{t.tag}</div>
+              </button>
+            ))}
+          </div>
+          <button onClick={onBack} className="mt-12 text-pink-300 hover:text-white w-full text-center font-bold tracking-widest transition-colors flex items-center justify-center gap-2">
+             <RotateCcw size={18} /> TRỞ VỀ TRUY CẬP
+          </button>
+        </div>
+      </div>
+    );
+
+    const GameInterface = ({ team, onBack }) => {
+      const [stationIndex, setStationIndex] = useState(() => {
+        const saved = localStorage.getItem(`timetravel_${team}_index_v15`);
+        return saved ? parseInt(saved) : 0;
+      });
+      const [score, setScore] = useState(() => {
+        const saved = localStorage.getItem(`timetravel_${team}_score_v15`);
+        return saved ? parseFloat(saved) : 0;
+      });
+      const [stats, setStats] = useState(() => {
+        const saved = localStorage.getItem(`timetravel_${team}_stats_v15`);
+        return saved ? JSON.parse(saved) : { correct: 0, wrong: 0 };
+      });
+
+      const [showIntro, setShowIntro] = useState(stationIndex === 0 && score === 0);
+      const [gameState, setGameState] = useState('playing'); 
+      const [timer, setTimer] = useState(60); 
+      const [selectedOption, setSelectedOption] = useState(null);
+      const [isAnswered, setIsAnswered] = useState(false);
+      const [isFullScreen, setIsFullScreen] = useState(false);
+      const [pointsGained, setPointsGained] = useState(0);
+
+      const getTeamTheme = (teamName) => {
+        switch(teamName) {
+          case "PHƯỢNG HOÀNG LỬA": return { primary: "from-red-500 to-orange-500", bgLight: "bg-red-50", border: "border-red-500", borderBottom: "border-b-red-700", text: "text-red-600", btnDepth: "bg-red-950", btnSurface: "bg-[#2a0e14] border-red-900", btnHover: "hover:bg-red-900 group-hover:border-red-500" };
+          case "BẠCH LONG VƯƠNG": return { primary: "from-blue-400 to-cyan-500", bgLight: "bg-cyan-50", border: "border-cyan-500", borderBottom: "border-b-cyan-700", text: "text-cyan-600", btnDepth: "bg-cyan-950", btnSurface: "bg-[#0a1a2f] border-cyan-900", btnHover: "hover:bg-cyan-900 group-hover:border-cyan-400" };
+          case "KỲ LÂN SẤM SÉT": return { primary: "from-yellow-400 to-amber-500", bgLight: "bg-yellow-50", border: "border-yellow-400", borderBottom: "border-b-yellow-600", text: "text-amber-600", btnDepth: "bg-yellow-900", btnSurface: "bg-[#2d240a] border-yellow-800", btnHover: "hover:bg-yellow-800 group-hover:border-yellow-400" };
+          case "HẮC BÁO CHIẾN BINH": return { primary: "from-fuchsia-500 to-purple-600", bgLight: "bg-fuchsia-50", border: "border-fuchsia-500", borderBottom: "border-b-fuchsia-700", text: "text-fuchsia-600", btnDepth: "bg-fuchsia-950", btnSurface: "bg-[#250d2e] border-fuchsia-900", btnHover: "hover:bg-fuchsia-900 group-hover:border-fuchsia-400" };
+          default: return { primary: "from-cyan-400 to-blue-500", bgLight: "bg-slate-50", border: "border-cyan-500", borderBottom: "border-b-cyan-700", text: "text-cyan-600", btnDepth: "bg-cyan-950", btnSurface: "bg-[#0a1a2f] border-cyan-900", btnHover: "hover:bg-cyan-900 group-hover:border-cyan-400" };
+        }
+      };
+
+      const theme = getTeamTheme(team);
+
+      useEffect(() => {
+        localStorage.setItem(`timetravel_${team}_index_v15`, stationIndex.toString());
+        localStorage.setItem(`timetravel_${team}_score_v15`, score.toString());
+        localStorage.setItem(`timetravel_${team}_stats_v15`, JSON.stringify(stats));
+      }, [stationIndex, score, stats, team]);
+
+      useEffect(() => {
+        if (gameState !== 'playing' || isAnswered || showIntro) return;
+        const interval = setInterval(() => {
+          setTimer(prev => {
+            if (prev <= 0) { handleAnswer(-1); return 0; }
+            return prev - 1;
+          });
+        }, 1000);
+        return () => clearInterval(interval);
+      }, [gameState, isAnswered, showIntro]);
+
+      useEffect(() => {
+        let timeout;
+        if (isAnswered && gameState === 'playing') {
+           timeout = setTimeout(() => { nextStation(); }, 3000);
+        }
+        return () => clearTimeout(timeout);
+      }, [isAnswered, gameState]);
+
+      const toggleFullScreen = () => {
+        if (!document.fullscreenElement) {
+          document.documentElement.requestFullscreen(); setIsFullScreen(true);
+        } else {
+          if (document.exitFullscreen) { document.exitFullscreen(); setIsFullScreen(false); }
+        }
+      };
+
+      const handleStartMission = () => {
+        playSound('warp'); setShowIntro(false); setTimer(60); 
+      };
+
+      const handleAnswer = (optionIndex) => {
+        if (isAnswered) return;
+        setIsAnswered(true);
+        
+        const teamQuestions = TEAM_DATA[team];
+        const currentQ = teamQuestions[stationIndex];
+        const isCorrect = optionIndex === currentQ.correct;
+        const isFast = timer >= 50; 
+        
+        let points = 0;
+        if (isCorrect) {
+          playSound('correct');
+          points = stats.correct === 0 ? 8.5 : 0.5;
+          if (isFast) points += 1; 
+          setStats(prev => ({ ...prev, correct: prev.correct + 1 }));
+        } else {
+          playSound('wrong');
+          points = -1; 
+          setStats(prev => ({ ...prev, wrong: prev.wrong + 1 }));
+        }
+
+        setScore(prev => prev + points);
+        setPointsGained(points);
+        setSelectedOption(optionIndex);
+      };
+
+      const nextStation = () => {
+        const teamQuestions = TEAM_DATA[team];
+        if (stationIndex < teamQuestions.length - 1) {
+          playSound('warp');
+          setStationIndex(prev => prev + 1);
+          setTimer(60); 
+          setIsAnswered(false);
+          setSelectedOption(null);
+          setPointsGained(0);
+        } else {
+          finishGame();
+        }
+      };
+
+      const finishGame = () => {
+        setGameState('finished');
+        playSound('correct');
+        
+        localStorage.removeItem(`timetravel_${team}_index_v15`);
+        localStorage.removeItem(`timetravel_${team}_score_v15`);
+        localStorage.removeItem(`timetravel_${team}_stats_v15`);
+
+        // Lưu vào Local Storage (dành cho bảng điều khiển giáo viên Offline)
+        let lb = JSON.parse(localStorage.getItem('timetravel_leaderboard_v15') || '[]');
+        lb = lb.filter(t => t.teamName !== team);
+        lb.push({
+          teamName: team,
+          score: score,
+          correctCount: stats.correct,
+          timestamp: Date.now()
+        });
+        localStorage.setItem('timetravel_leaderboard_v15', JSON.stringify(lb));
+      };
+
+      if (showIntro) {
+        return (
+          <div className="h-[100dvh] w-full bg-[#2D0A16] text-white flex flex-col items-center justify-center p-4 md:p-8 relative overflow-hidden">
+            <StarField />
+            <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className={`max-w-2xl bg-[#4c0519]/80 backdrop-blur-md border-2 ${theme.border} p-8 md:p-12 rounded-[2rem] relative z-10 text-center shadow-[0_0_50px_rgba(225,29,72,0.4)]`}>
+              <h1 className={`text-3xl md:text-5xl font-black ${theme.text} mb-6 uppercase tracking-widest drop-shadow-md`}>Nhiệm Vụ Tối Mật</h1>
+              <div className="text-lg md:text-xl leading-relaxed text-pink-100 mb-8 font-medium">
+                Biệt đội <span className={`${theme.text} font-black uppercase`}>{team}</span> chuẩn bị.<br/><br/>
+                Vượt qua <span className="text-white font-bold">4 Trạm Không Gian</span> bằng cách giải mã dữ liệu.<br/><br/>
+                <div className="bg-[#881337]/50 p-4 rounded-xl border border-[#be123c]">
+                   Cơ chế điểm: <br/>Sai 1 ý: <span className="text-red-400 font-bold">-1đ</span> | Trả lời nhanh (≤10s): <span className="text-yellow-400 font-bold">+1đ thưởng</span>.
+                </div>
+              </div>
+              <button onClick={handleStartMission} className={`group h-16 w-64 mx-auto rounded-xl bg-gradient-to-r ${theme.primary} text-white font-black text-xl uppercase tracking-widest shadow-[0_5px_20px_rgba(0,0,0,0.4)] transition-transform hover:scale-105 active:scale-95`}>
+                 KHỞI HÀNH
+              </button>
+            </motion.div>
+          </div>
+        );
+      }
+
+      if (gameState === 'finished') {
+        return (
+          <div className="h-[100dvh] w-full bg-[#2D0A16] flex flex-col items-center justify-center p-6 relative text-center">
+            <StarField />
+            <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className={`relative z-10 bg-[#4c0519]/80 backdrop-blur-md border-2 ${theme.border} p-8 md:p-12 rounded-[3rem] max-w-2xl w-full shadow-2xl`}>
+                <div className="flex justify-center mb-6"><Trophy size={80} className="text-yellow-400 drop-shadow-[0_0_15px_rgba(250,204,21,0.5)]" /></div>
+                <h2 className="text-4xl md:text-5xl font-black text-white mb-2 uppercase tracking-widest">XUẤT SẮC!</h2>
+                <p className={`text-2xl ${theme.text} font-bold mb-8 uppercase`}>{team}</p>
+                <div className="flex justify-center items-end gap-2 mb-10 bg-[#881337]/50 py-8 rounded-3xl border border-[#be123c] shadow-inner">
+                   <span className="text-8xl md:text-[150px] font-black text-transparent bg-clip-text bg-gradient-to-b from-yellow-300 to-yellow-600 drop-shadow-lg leading-none">{score}</span>
+                   <span className="text-2xl md:text-4xl font-bold text-pink-200 mb-4 md:mb-8">/ 10+</span>
+                </div>
+                <div className="flex flex-col md:flex-row gap-4 justify-center">
+                  <button onClick={() => window.location.reload()} className="bg-rose-700 hover:bg-rose-600 px-8 py-4 rounded-full font-bold text-white shadow-lg transition-transform hover:scale-105 border border-rose-500">CHƠI LẠI</button>
+                  <button onClick={onBack} className={`bg-gradient-to-r ${theme.primary} px-8 py-4 rounded-full font-bold text-white shadow-lg transition-transform hover:scale-105`}>VỀ TRANG CHỦ</button>
+                </div>
+            </motion.div>
+          </div>
+        );
+      }
+
+      const teamQuestions = TEAM_DATA[team];
+      const currentQ = teamQuestions[stationIndex];
+      
+      return (
+        <div className="h-[100dvh] w-full bg-[#2D0A16] text-white flex flex-col relative overflow-hidden">
+          <div className="absolute inset-0 z-0"><StarField /></div>
+          <div className="flex-none h-[60px] md:h-[70px] bg-[#4c0519]/90 backdrop-blur-md flex justify-between items-center px-4 md:px-6 shadow-md border-b border-rose-900 relative z-20">
+            <div className="flex items-center gap-3 md:gap-4">
+                <div className={`bg-gradient-to-r ${theme.primary} px-4 md:px-6 py-1.5 md:py-2 rounded-lg font-black text-white uppercase tracking-wider text-xs md:text-base shadow-lg`}>{team}</div>
+                <div className="flex items-center gap-2 text-pink-200 text-xs md:text-sm font-medium bg-rose-900/50 px-3 py-1 rounded-md border border-rose-800"><ListChecks size={16}/> {currentQ.type}</div>
+            </div>
+            <div className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 flex items-center justify-center">
+                 <div className={`font-black text-2xl md:text-4xl ${timer < 10 ? 'text-red-400 animate-pulse' : 'text-white'}`}><Clock className="inline-block mr-2 mb-1" size={24}/> {timer}</div>
+            </div>
+            <div className="flex items-center gap-4 text-right">
+                <div className="bg-yellow-500/20 text-yellow-400 px-4 py-1.5 md:py-2 rounded-lg font-black flex items-center gap-2 text-sm md:text-base border border-yellow-500/40"><Star size={18} className="fill-yellow-400" /> {score}</div>
+                <button onClick={toggleFullScreen} className="text-pink-300 hover:text-white transition-colors hidden md:block">{isFullScreen ? <Minimize size={20}/> : <Maximize size={20}/>}</button>
+            </div>
+          </div>
+
+          <div className="flex-1 min-h-0 flex flex-col relative z-10 w-full max-w-7xl mx-auto px-4 py-3 md:py-5 gap-4 md:gap-6">
+             <div className="flex-none flex flex-col items-center">
+                <div className={`flex items-center gap-3 ${theme.text} font-black text-2xl md:text-4xl lg:text-5xl uppercase tracking-widest drop-shadow-[0_0_15px_currentColor] mb-1 md:mb-2`}>
+                   <Atom className="animate-spin-slow w-8 h-8 md:w-10 md:h-10" /> {currentQ.title}
+                </div>
+                <div className="hidden md:block bg-[#4c0519]/50 border-l-2 border-rose-500 px-4 py-1 text-pink-200 italic text-sm md:text-base truncate max-w-full">"{currentQ.story}"</div>
+             </div>
+
+             <div className={`flex-1 min-h-0 bg-white border-[4px] border-b-[10px] md:border-[6px] md:border-b-[14px] ${theme.border} ${theme.borderBottom} rounded-[1.5rem] md:rounded-[2.5rem] flex flex-col shadow-[0_15px_40px_rgba(0,0,0,0.5)] overflow-hidden relative`}>
+                <div className={`absolute top-0 left-0 w-full h-2 md:h-3 bg-gradient-to-r ${theme.primary}`}></div>
+                <div className="flex-1 min-h-0 overflow-y-auto p-4 md:p-6 lg:p-8 custom-scrollbar w-full flex flex-col">
+                    <div className="min-h-full flex flex-col justify-center items-center py-2 md:py-4 w-full">
+                        <h3 className={`font-black text-slate-800 leading-normal w-full text-center ${currentQ.statements ? 'text-xl md:text-2xl lg:text-3xl mb-4 border-b-2 border-slate-100 pb-4' : 'text-2xl md:text-3xl lg:text-4xl px-2'}`}>
+                          {currentQ.question}
+                        </h3>
+                        {currentQ.statements && (
+                           <div className="space-y-3 w-full max-w-5xl flex-none px-1">
+                              {currentQ.statements.map((stmt, sIdx) => (
+                                 <div key={sIdx} className={`flex items-start gap-3 p-3 md:p-4 rounded-xl border-2 border-slate-100 ${theme.bgLight} transition-colors`}>
+                                    <span className={`font-black ${theme.text} text-xl md:text-2xl mt-0.5`}>•</span>
+                                    <span className="text-base md:text-lg lg:text-xl text-slate-700 font-bold leading-snug">{stmt}</span>
+                                 </div>
+                              ))}
+                           </div>
+                        )}
+                    </div>
+                </div>
+                {currentQ.statements && (
+                    <div className={`flex-none ${theme.bgLight} border-t border-slate-200 py-3 md:py-4 text-center text-lg md:text-2xl font-black ${theme.text} w-full shadow-inner`}>{currentQ.ask}</div>
+                )}
+             </div>
+
+             <div className={`flex-none w-full grid gap-3 md:gap-5 relative ${currentQ.statements ? 'grid-cols-4 h-[10vh] md:h-[12vh] min-h-[60px]' : 'grid-cols-1 md:grid-cols-2 h-[22vh] md:h-[20vh] min-h-[120px]'}`}>
+                {currentQ.options.map((opt, idx) => {
+                   const letterMatch = opt.match(/^([A-D]\.)\s*(.*)$/);
+                   const letter = letterMatch ? letterMatch[1] : "";
+                   const textContent = letterMatch ? letterMatch[2] : opt;
+
+                   let containerClass = "group relative h-full w-full rounded-2xl md:rounded-[1.5rem] transition-all duration-150 active:scale-95 cursor-pointer ";
+                   let surfaceClass = `absolute inset-0 rounded-2xl md:rounded-[1.5rem] flex items-center justify-center border-2 shadow-[inset_0_2px_15px_rgba(255,255,255,0.05)] transition-transform duration-150 `;
+                   let depthClass = "absolute inset-0 rounded-2xl md:rounded-[1.5rem] transform translate-y-2 md:translate-y-3 transition-transform duration-150 ";
+
+                   if (isAnswered) {
+                      if (idx === currentQ.correct) {
+                         depthClass += "bg-emerald-900 translate-y-2 md:translate-y-3";
+                         surfaceClass += "bg-emerald-600 border-emerald-400 translate-y-0 shadow-[0_0_40px_rgba(16,185,129,0.5)] z-10";
+                      } else if (idx === selectedOption) {
+                         depthClass += "bg-rose-950 translate-y-2 md:translate-y-3";
+                         surfaceClass += "bg-rose-900/80 border-rose-700 text-pink-300 translate-y-0";
+                      } else {
+                         depthClass += "bg-[#1a060d]";
+                         surfaceClass += "bg-[#2D0A16]/80 border-[#4c0519] text-[#701a35] opacity-60 translate-y-0";
+                      }
+                   } else {
+                      depthClass += `${theme.btnDepth}`;
+                      surfaceClass += `${theme.btnSurface} ${theme.btnHover} group-hover:-translate-y-1`;
+                   }
+
+                   return (
+                      <button key={idx} onClick={() => handleAnswer(idx)} disabled={isAnswered} className={containerClass}>
+                         <div className={depthClass}></div>
+                         <div className={surfaceClass}>
+                            <div className={`font-black text-white w-full px-3 md:px-6 flex items-center ${currentQ.statements ? "justify-center text-xl md:text-2xl lg:text-3xl" : "text-lg md:text-xl lg:text-2xl text-left leading-snug"}`}>
+                               {letter && <span className={`${theme.text} mr-2 md:mr-4 drop-shadow-md`}>{letter}</span>}
+                               <span className="font-bold drop-shadow-sm">{textContent}</span>
+                            </div>
+                         </div>
+                      </button>
+                   )
+                })}
+             </div>
+          </div>
+
+          <AnimatePresence>
+             {isAnswered && (
+                <motion.div initial={{ opacity: 0, scale: 0.5 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 z-[60] flex items-center justify-center bg-black/40 backdrop-blur-sm pointer-events-none">
+                   <div className="bg-[#2D0A16] border-2 border-rose-800 rounded-[3rem] p-10 md:p-16 text-center shadow-[0_0_80px_rgba(225,29,72,0.6)]">
+                       <div className={`text-8xl md:text-[140px] font-black mb-4 leading-none ${pointsGained > 0 ? 'text-[#34d399] drop-shadow-[0_0_40px_#10b981]' : 'text-red-500 drop-shadow-[0_0_40px_#ef4444]'}`}>
+                          {pointsGained > 0 ? `+${pointsGained}` : pointsGained}
+                       </div>
+                       <div className="text-pink-200 font-bold text-lg md:text-2xl flex items-center justify-center gap-3">
+                          <Clock className="animate-spin-slow w-6 h-6"/> Đang tự động chuyển dữ liệu...
+                       </div>
+                   </div>
+                </motion.div>
+             )}
+          </AnimatePresence>
+        </div>
+      );
+    };
+
+    const TeacherDashboard = ({ onBack }) => {
+      const [teamScores, setTeamScores] = useState([]);
+      const [showSummary, setShowSummary] = useState(false);
+
+      useEffect(() => {
+        // Lấy dữ liệu từ Local Storage thay vì Firebase
+        const lb = JSON.parse(localStorage.getItem('timetravel_leaderboard_v15') || '[]');
+        lb.sort((a, b) => b.score - a.score);
+        setTeamScores(lb);
+      }, []);
+
+      if (showSummary) {
+         const topScore = teamScores.length > 0 ? teamScores[0].score : 0;
+         const totalQuestions = teamScores.length * 4;
+         const totalCorrects = teamScores.reduce((acc, t) => acc + t.correctCount, 0);
+         const accuracy = totalQuestions > 0 ? Math.round((totalCorrects / totalQuestions) * 100) : 0;
+         const avgScore = teamScores.length > 0 ? (teamScores.reduce((acc, t) => acc + t.score, 0) / teamScores.length).toFixed(1) : 0;
+
+         return (
+            <div className="min-h-[100dvh] bg-[#2D0A16] font-sans relative text-white flex flex-col items-center justify-center p-4">
+               <StarField />
+               <VictoryConfetti />
+               <h1 className="text-6xl md:text-8xl font-black text-transparent bg-clip-text bg-gradient-to-b from-[#fef08a] to-[#ca8a04] mb-4 drop-shadow-[0_0_20px_rgba(250,204,21,0.5)] z-10 flex items-center gap-4">XUẤT SẮC! <Trophy className="text-yellow-400 drop-shadow-md" size={64}/></h1>
+               <div className="text-4xl md:text-5xl font-bold text-white mb-12 z-10 drop-shadow-md">ĐIỂM CAO NHẤT: {topScore}</div>
+               <div className="w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 gap-6 z-10">
+                  <div className="bg-[#4c0519]/80 backdrop-blur-md border border-rose-800 rounded-[2rem] p-8 shadow-2xl">
+                     <h3 className="text-2xl font-bold text-pink-300 mb-6 border-b border-rose-800 pb-4 uppercase tracking-widest">Bảng Xếp Hạng Offline</h3>
+                     <div className="flex flex-col gap-4">
+                        {teamScores.map((t, i) => (
+                           <div key={i} className="flex items-center justify-between text-lg md:text-xl bg-[#881337]/50 p-4 rounded-xl border border-rose-900/50">
+                              <div className="flex items-center gap-4">
+                                 {i === 0 && <span className="text-3xl drop-shadow-md">🥇</span>}
+                                 {i === 1 && <span className="text-3xl drop-shadow-md">🥈</span>}
+                                 {i === 2 && <span className="text-3xl drop-shadow-md">🥉</span>}
+                                 {i > 2 && <span className="text-2xl text-pink-500 font-black w-8 text-center">{i+1}.</span>}
+                                 <span className="font-bold">{t.teamName}</span>
+                              </div>
+                              <span className="font-black text-yellow-400 text-2xl">{t.score}đ</span>
+                           </div>
+                        ))}
+                     </div>
+                  </div>
+                  <div className="bg-[#4c0519]/80 backdrop-blur-md border border-rose-800 rounded-[2rem] p-8 shadow-2xl">
+                     <h3 className="text-2xl font-bold text-pink-300 mb-6 border-b border-rose-800 pb-4 uppercase tracking-widest">Thống Kê Lớp</h3>
+                     <div className="mb-8">
+                        <div className="flex justify-between text-lg mb-2"><span className="font-bold text-pink-100">Tỷ lệ chính xác chung:</span><span className="font-black text-emerald-400">{accuracy}%</span></div>
+                        <div className="w-full bg-[#2D0A16] h-6 rounded-full overflow-hidden border border-rose-900"><div className="bg-gradient-to-r from-emerald-400 to-cyan-500 h-full" style={{ width: `${accuracy}%` }}></div></div>
+                     </div>
+                     <div className="bg-[#881337]/50 border border-rose-800 rounded-2xl p-6 flex flex-col gap-6">
+                        <div className="flex justify-between items-center"><div className="text-pink-200 font-bold text-lg">Điểm trung bình lớp:</div><div className="text-3xl font-black text-yellow-400">{avgScore}đ</div></div>
+                        <div className="flex justify-between items-center"><div className="text-pink-200 font-bold text-lg">Tổng số đội đã nộp:</div><div className="text-3xl font-black text-cyan-400">{teamScores.length}/4</div></div>
+                     </div>
+                  </div>
+               </div>
+               <button onClick={() => setShowSummary(false)} className="mt-12 bg-[#881337] hover:bg-[#9f1239] border border-rose-500 px-8 py-3 rounded-full font-bold text-white z-10 transition-colors">← Trở về bảng theo dõi</button>
+            </div>
+         );
+      }
+
+      return (
+        <div className="min-h-[100dvh] bg-[#2D0A16] p-4 md:p-8 font-sans relative text-white overflow-y-auto">
+          <StarField />
+          <div className="relative z-10 max-w-5xl mx-auto">
+             <div className="flex justify-between items-center mb-10 border-b border-rose-800 pb-6">
+                <button onClick={onBack} className="text-pink-400 hover:text-white font-bold">← TRỞ VỀ</button>
+                <h1 className="text-3xl md:text-5xl font-black text-white uppercase tracking-widest text-center flex-1">Theo Dõi Tiến Độ</h1>
+                <button onClick={() => setShowSummary(true)} className="bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-400 hover:to-orange-400 text-white font-black px-6 py-2 rounded-lg shadow-[0_0_15px_rgba(245,158,11,0.5)] transition-all active:scale-95">TỔNG KẾT</button>
+             </div>
+             <div className="flex flex-col gap-4">
+                {teamScores.map((team, index) => {
+                   let medalColor = "text-rose-900";
+                   if(index === 0) medalColor = "text-yellow-400";
+                   else if(index === 1) medalColor = "text-slate-300";
+                   else if(index === 2) medalColor = "text-amber-600";
+
+                   return (
+                   <div key={index} className="bg-[#4c0519]/80 backdrop-blur-sm border border-rose-800 p-6 rounded-2xl flex items-center justify-between shadow-lg hover:border-rose-500 transition-colors">
+                      <div className="flex items-center gap-6">
+                          <div className={`w-12 h-12 rounded-full flex items-center justify-center font-black text-xl bg-[#2D0A16] ${medalColor}`}>{index + 1}</div>
+                          <div>
+                             <div className="text-2xl font-black text-white uppercase">{team.teamName}</div>
+                             <div className="text-pink-300 text-sm mt-1">Hoàn thành: {team.correctCount}/4 trạm</div>
+                          </div>
+                      </div>
+                      <div className="text-5xl font-black text-cyan-400">{team.score}<span className="text-xl text-pink-500 ml-1">đ</span></div>
+                   </div>
+                )})}
+                {teamScores.length === 0 && (
+                   <div className="text-center py-20 text-pink-700 text-xl font-bold tracking-widest uppercase">CHƯA CÓ DỮ LIỆU TỪ CÁC ĐỘI (CHƠI TRÊN MÁY NÀY ĐỂ HIỂN THỊ)</div>
+                )}
+             </div>
+          </div>
+        </div>
+      );
+    };
+
+    const root = createRoot(document.getElementById('root'));
+    root.render(<TimeTravelQuiz />);
+  </script>
+</body>
+</html>
